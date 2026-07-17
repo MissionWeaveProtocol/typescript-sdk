@@ -1,4 +1,7 @@
 coverage
+conformance
 dist
 node_modules
 package-lock.json
+PROTOCOL_PIN.json
+schemas
