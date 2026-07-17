@@ -1,6 +1,15 @@
 export const protocolVersion = "0.1" as const;
 export const wireNamespace = "missionweaveprotocol" as const;
 
+export * from "./canonical-json.js";
+export * from "./conformance.js";
+export * from "./crypto.js";
+export * from "./frame-codec.js";
+export * from "./json-types.js";
+export * from "./package-root.js";
+export * from "./schema-catalog.js";
+export * from "./strict-json.js";
+
 export interface SdkMetadata {
   readonly packageName: "@missionweaveprotocol/sdk";
   readonly protocolVersion: typeof protocolVersion;

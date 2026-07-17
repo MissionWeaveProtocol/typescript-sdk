@@ -56,6 +56,10 @@ try {
   ) {
     throw new Error("packed ESM or CommonJS entry point failed");
   }
+  const commonJsReport = required.runConformance(installedRoot);
+  if (commonJsReport.passed !== 43 || commonJsReport.failed !== 0) {
+    throw new Error("packed CommonJS conformance runner failed");
+  }
 
   const packageDocument = JSON.parse(
     await readFile(path.join(installedRoot, "package.json"), "utf8"),
@@ -65,8 +69,23 @@ try {
   }
 
   const bundle = await verifyProtocolBundle(installedRoot);
+  const executable = path.join(
+    consumer,
+    "node_modules",
+    ".bin",
+    process.platform === "win32"
+      ? "missionweaveprotocol-conformance.cmd"
+      : "missionweaveprotocol-conformance",
+  );
+  const conformance = await execute(executable, [], {
+    cwd: consumer,
+    maxBuffer: 10 * 1024 * 1024,
+  });
+  if (!conformance.stdout.includes("43/43 conformance vectors passed")) {
+    throw new Error("installed conformance executable failed");
+  }
   console.log(
-    `Package smoke test passed for ${packResult[0].filename}: ${bundle.schemaFiles} schemas and ${bundle.conformanceFiles} conformance files.`,
+    `Package smoke test passed for ${packResult[0].filename}: ${bundle.schemaFiles} schemas, ${bundle.conformanceFiles} conformance files, and the installed CLI.`,
   );
 } finally {
   await rm(workspace, { force: true, recursive: true });

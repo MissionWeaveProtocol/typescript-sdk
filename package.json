@@ -21,6 +21,9 @@
     },
     "./package.json": "./package.json"
   },
+  "bin": {
+    "missionweaveprotocol-conformance": "./dist/bin/conformance.js"
+  },
   "files": [
     "dist",
     "schemas",
@@ -44,6 +47,10 @@
     "url": "https://github.com/missionweaveprotocol/typescript-sdk/issues"
   },
   "homepage": "https://missionweaveprotocol.github.io/",
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  },
   "overrides": {
     "esbuild": "0.28.1"
   },
