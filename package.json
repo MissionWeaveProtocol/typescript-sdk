@@ -23,6 +23,9 @@
   },
   "files": [
     "dist",
+    "schemas",
+    "conformance",
+    "PROTOCOL_PIN.json",
     "LICENSE",
     "README.md"
   ],
@@ -46,12 +49,14 @@
   },
   "scripts": {
     "build": "tsup",
-    "check": "npm run check:policy && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build && npm run package:check",
+    "check": "npm run check:policy && npm run check:pin && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build && npm run package:check && npm run package:smoke",
+    "check:pin": "node scripts/check-protocol-pin.mjs",
     "check:policy": "node scripts/check-repository-policy.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "package:check": "publint",
+    "package:smoke": "node scripts/smoke-package.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
