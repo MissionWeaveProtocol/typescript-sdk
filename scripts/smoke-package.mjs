@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -66,6 +66,21 @@ try {
   );
   if (packageDocument.name !== "@missionweaveprotocol/sdk") {
     throw new Error("installed package has an unexpected name");
+  }
+
+  for (const packagedPath of [
+    "README.md",
+    "README.zh-CN.md",
+    "README.zh-TW.md",
+    "README.ja.md",
+    "README.es.md",
+    "README.fr.md",
+    "README.de.md",
+    path.join("examples", "strict-frame-validation.ts"),
+    path.join("examples", "sign-command.ts"),
+    path.join("examples", "run-conformance.ts"),
+  ]) {
+    await access(path.join(installedRoot, packagedPath));
   }
 
   const bundle = await verifyProtocolBundle(installedRoot);
