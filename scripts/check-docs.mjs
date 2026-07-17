@@ -37,8 +37,16 @@ const requiredTechnicalLiterals = [
   "schemas/",
   "conformance/",
   "PROTOCOL_PIN.json",
-  "schema-and-vector conformance only",
 ];
+const conformanceClaims = new Map([
+  ["README.md", "schema-and-vector conformance only"],
+  ["README.zh-CN.md", "schema-and-vector conformance only"],
+  ["README.zh-TW.md", "schema-and-vector conformance only"],
+  ["README.ja.md", "schema-and-vector conformance only"],
+  ["README.es.md", "conformidad con esquemas y vectores de prueba"],
+  ["README.fr.md", "conformité limitée aux schémas et aux vecteurs de test"],
+  ["README.de.md", "Schema- und Testvektorkonformität"],
+]);
 const failures = [];
 const readmes = new Map();
 
@@ -50,7 +58,7 @@ for (const name of readmeNames) {
   }
   const content = readFileSync(file, "utf8");
   readmes.set(name, content);
-  const normalized = content.replace(/\s+/gu, " ");
+  const normalized = content.replace(/^>\s?/gmu, "").replace(/\s+/gu, " ");
   if (!normalized.includes(switcher)) {
     failures.push(`${name}: missing the canonical language switcher`);
   }
@@ -58,6 +66,13 @@ for (const name of readmeNames) {
     if (!normalized.includes(literal)) {
       failures.push(`${name}: missing technical literal ${literal}`);
     }
+  }
+  const conformanceClaim = conformanceClaims.get(name);
+  if (
+    conformanceClaim === undefined ||
+    !normalized.includes(conformanceClaim)
+  ) {
+    failures.push(`${name}: missing its localized conformance claim`);
   }
   if (!/(?:`0\.1`|<code>0\.1<\/code>)/u.test(content)) {
     failures.push(`${name}: missing the protocol version literal 0.1`);

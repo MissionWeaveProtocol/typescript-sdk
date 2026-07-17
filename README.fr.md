@@ -7,10 +7,10 @@
 SDK TypeScript officiel de MissionWeaveProtocol. Le paquet npm est publié sous
 le nom <code>@missionweaveprotocol/sdk</code>.
 
-> Ce SDK revendique uniquement **schema-and-vector conformance only (conformité
-> aux schémas et aux vecteurs de test)**. Il ne revendique ni l’interopérabilité
-> du transport, ni l’équivalence des comportements à l’exécution, ni la
-> conformité de bout en bout au protocole.
+> Ce SDK revendique uniquement une **conformité limitée aux schémas et aux
+> vecteurs de test**. Il ne revendique ni l’interopérabilité du transport, ni
+> l’équivalence des comportements à l’exécution, ni la conformité de bout en
+> bout au protocole.
 
 ## Installation
 
@@ -238,8 +238,8 @@ JavaScript de <code>exports</code>.
   validez ensuite le schéma, puis appliquez les contrôles d’autorisation, de
   politique et d’état propres à votre organisation.
 - Le succès du CLI indique uniquement que les artefacts inclus produisent les
-  résultats de schéma attendus. La portée reste **schema-and-vector conformance
-  only**.
+  résultats de schéma attendus. La portée reste limitée à la **conformité des
+  schémas et des vecteurs de test**.
 
 ## Développement
 
