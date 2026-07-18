@@ -18,6 +18,8 @@ npm install @missionweaveprotocol/sdk
 
 需要 Node.js 20 或更高版本。
 
+SDK 使用 Node.js 的文件系统和密码学 API；不声明支持浏览器或 Deno。
+
 ## 模块支持
 
 本包同时提供 ESM、CommonJS 和相应的 TypeScript 类型声明。
@@ -44,16 +46,20 @@ const {
 
 此版本固定到以下 MissionWeaveProtocol 工件：
 
-| 项目           | 固定值                                                |
-| -------------- | ----------------------------------------------------- |
-| npm 包         | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
-| 协议版本       | <code>0.1</code>                                      |
-| Wire namespace | <code>missionweaveprotocol</code>                     |
-| 协议提交       | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
-| Schema         | 21 个                                                 |
-| 一致性测试向量 | 52 个（25 个有效，27 个无效）                         |
+| 项目           | 固定值                                                        |
+| -------------- | ------------------------------------------------------------- |
+| npm 包         | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
+| 协议版本       | <code>0.1</code>                                              |
+| Wire namespace | <code>missionweaveprotocol</code>                             |
+| 协议提交       | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Schema         | 21 个                                                         |
+| 一致性测试向量 | 52 个（25 个有效，27 个无效）                                 |
 
-完整的来源、文件计数和 SHA-256 摘要记录在 <code>PROTOCOL_PIN.json</code>
+[protocol-commit]:
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
+
+完整的来源、文件计数和 SHA-256 摘要记录在
+[`PROTOCOL_PIN.json`](PROTOCOL_PIN.json)
 中。SDK 在构建检查期间验证固定工件；它不会在运行时从网络下载 Schema。
 
 ## 严格 JSON 和 Schema 验证

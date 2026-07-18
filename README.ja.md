@@ -18,6 +18,8 @@ npm install @missionweaveprotocol/sdk
 
 Node.js 20 以降が必要です。
 
+SDK は Node.js のファイルシステム API と暗号 API を使用するため、ブラウザーおよび Deno のサポートは対象外です。
+
 ## モジュール対応
 
 このパッケージは ESM と CommonJS の両方、および対応する TypeScript 型宣言を提供します。
@@ -44,16 +46,20 @@ const {
 
 このリリースは、次の MissionWeaveProtocol 成果物に固定されています。
 
-| 項目                 | 固定値                                                |
-| -------------------- | ----------------------------------------------------- |
-| npm パッケージ       | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
-| プロトコルバージョン | <code>0.1</code>                                      |
-| Wire namespace       | <code>missionweaveprotocol</code>                     |
-| プロトコルコミット   | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
-| Schema               | 21                                                    |
-| 適合性テストベクトル | 52（valid 25、invalid 27）                            |
+| 項目                 | 固定値                                                        |
+| -------------------- | ------------------------------------------------------------- |
+| npm パッケージ       | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
+| プロトコルバージョン | <code>0.1</code>                                              |
+| Wire namespace       | <code>missionweaveprotocol</code>                             |
+| プロトコルコミット   | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Schema               | 21                                                            |
+| 適合性テストベクトル | 52（valid 25、invalid 27）                                    |
 
-出典、ファイル数、SHA-256 ダイジェストの全情報は <code>PROTOCOL_PIN.json</code>
+[protocol-commit]:
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
+
+出典、ファイル数、SHA-256 ダイジェストの全情報は
+[`PROTOCOL_PIN.json`](PROTOCOL_PIN.json)
 に記録されています。SDK はビルド時のチェックで固定成果物を検証し、実行時にネットワークから Schema をダウンロードしません。
 
 ## 厳密な JSON と Schema 検証

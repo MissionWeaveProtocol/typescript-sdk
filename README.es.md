@@ -19,6 +19,9 @@ npm install @missionweaveprotocol/sdk
 
 Requiere Node.js 20 o una versión posterior.
 
+El SDK utiliza las API de sistema de archivos y criptografía de Node.js; no
+declara compatibilidad con navegadores ni con Deno.
+
 ## Compatibilidad de módulos
 
 El paquete incluye puntos de entrada ESM y CommonJS, junto con sus declaraciones
@@ -46,19 +49,22 @@ const {
 
 Esta versión está fijada a los siguientes artefactos de MissionWeaveProtocol:
 
-| Elemento                | Valor fijado                                          |
-| ----------------------- | ----------------------------------------------------- |
-| Paquete npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
-| Versión del protocolo   | <code>0.1</code>                                      |
-| Wire namespace          | <code>missionweaveprotocol</code>                     |
-| Commit del protocolo    | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
-| Esquemas                | 21                                                    |
-| Vectores de conformidad | 52 (25 válidos y 27 no válidos)                       |
+| Elemento                | Valor fijado                                                  |
+| ----------------------- | ------------------------------------------------------------- |
+| Paquete npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
+| Versión del protocolo   | <code>0.1</code>                                              |
+| Wire namespace          | <code>missionweaveprotocol</code>                             |
+| Commit del protocolo    | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Esquemas                | 21                                                            |
+| Vectores de conformidad | 52 (25 válidos y 27 no válidos)                               |
+
+[protocol-commit]:
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
 
 La procedencia completa, los recuentos de archivos y los resúmenes SHA-256 están
-registrados en <code>PROTOCOL_PIN.json</code>. El SDK verifica los artefactos
-fijados durante las comprobaciones de compilación; no descarga esquemas de la
-red durante la ejecución.
+registrados en [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json). El SDK verifica los
+artefactos fijados durante las comprobaciones de compilación; no descarga
+esquemas de la red durante la ejecución.
 
 ## JSON estricto y validación de esquemas
 

@@ -19,6 +19,9 @@ npm install @missionweaveprotocol/sdk
 
 Erfordert Node.js 20 oder neuer.
 
+Das SDK verwendet die Dateisystem- und Kryptografie-APIs von Node.js; es
+beansprucht keine Unterstützung für Browser oder Deno.
+
 ## Modulunterstützung
 
 Das Paket stellt ESM- und CommonJS-Einstiegspunkte sowie die zugehörigen
@@ -46,18 +49,22 @@ const {
 
 Diese Version ist auf die folgenden MissionWeaveProtocol-Artefakte festgelegt:
 
-| Element                  | Festgelegter Wert                                     |
-| ------------------------ | ----------------------------------------------------- |
-| npm-Paket                | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
-| Protokollversion         | <code>0.1</code>                                      |
-| Wire namespace           | <code>missionweaveprotocol</code>                     |
-| Protokoll-Commit         | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
-| Schemas                  | 21                                                    |
-| Konformitätstestvektoren | 52 (25 gültig, 27 ungültig)                           |
+| Element                  | Festgelegter Wert                                             |
+| ------------------------ | ------------------------------------------------------------- |
+| npm-Paket                | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
+| Protokollversion         | <code>0.1</code>                                              |
+| Wire namespace           | <code>missionweaveprotocol</code>                             |
+| Protokoll-Commit         | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Schemas                  | 21                                                            |
+| Konformitätstestvektoren | 52 (25 gültig, 27 ungültig)                                   |
+
+[protocol-commit]:
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
 
 Die vollständige Herkunft, Dateianzahlen und SHA-256-Prüfsummen stehen in
-<code>PROTOCOL_PIN.json</code>. Das SDK prüft die festgelegten Artefakte während
-der Build-Prüfungen; zur Laufzeit lädt es keine Schemas aus dem Netzwerk.
+[`PROTOCOL_PIN.json`](PROTOCOL_PIN.json). Das SDK prüft die festgelegten
+Artefakte während der Build-Prüfungen; zur Laufzeit lädt es keine Schemas aus
+dem Netzwerk.
 
 ## Striktes JSON und Schemavalidierung
 
