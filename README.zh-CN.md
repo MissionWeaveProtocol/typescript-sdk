@@ -130,7 +130,8 @@ const canonicalBytes = codec.encode(frame);
   Document 类型的六阶段签名与验证。
 
 <code>SignedDocumentCodec.verify</code> 接受收到的原始 UTF-8 字节和
-<code>KeyResolver</code>，并返回规范签名字节与哈希、完整文档哈希、精确受保护时间以及已解析的密钥与 Principal 证据。该结果只证明密码学验证；首次准入、Command 新鲜度和授权仍须单独检查。
+<code>KeyResolver</code>，并返回规范签名字节与哈希、完整文档哈希、精确受保护时间以及已解析的密钥与 Principal 证据。该结果只证明密码学验证；首次准入记录（First-Admission
+Record）、Command 新鲜度和授权仍须单独检查。
 
 ```ts
 import { readFileSync } from "node:fs";

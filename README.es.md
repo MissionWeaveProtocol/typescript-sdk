@@ -140,8 +140,8 @@ El SDK proporciona:
 <code>KeyResolver</code>, y devuelve los bytes y el hash canónicos de firma, el
 hash del documento completo, el tiempo protegido exacto y la evidencia de la
 clave y del Principal resueltos. El resultado solo demuestra la verificación
-criptográfica; First Admission, la vigencia del Command y la autorización se
-comprueban por separado.
+criptográfica; First-Admission Record, la vigencia del Command y la autorización
+se comprueban por separado.
 
 ```ts
 import { readFileSync } from "node:fs";

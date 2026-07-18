@@ -141,7 +141,7 @@ Das SDK bietet:
 <code>KeyResolver</code>. Das Ergebnis enthält kanonische Signaturbytes und
 -Hash, den Hash des vollständigen Dokuments, die exakte geschützte Zeit sowie
 Nachweise zum aufgelösten Schlüssel und Principal. Es belegt nur die
-kryptografische Verifikation; First Admission, Command-Aktualität und
+kryptografische Verifikation; First-Admission Record, Command-Aktualität und
 Autorisierung bleiben getrennte Prüfungen.
 
 ```ts

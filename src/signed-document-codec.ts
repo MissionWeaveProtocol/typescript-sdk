@@ -25,7 +25,7 @@ import {
 } from "./schema-catalog.js";
 import {
   isExtremeJsonNumber,
-  parseStrictJsonObjectForVerification,
+  parseStrictJsonForVerification,
   StrictJsonSyntaxError,
   type VerificationJsonObject,
   type VerificationJsonValue,
@@ -373,9 +373,9 @@ export class SignedDocumentCodec {
         "Signed Document verification requires raw UTF-8 bytes",
       );
     }
-    let document: VerificationJsonObject;
+    let document: VerificationJsonValue;
     try {
-      document = parseStrictJsonObjectForVerification(rawUtf8JsonBytes);
+      document = parseStrictJsonForVerification(rawUtf8JsonBytes);
     } catch (error) {
       if (error instanceof StrictJsonSyntaxError) {
         verificationFailure("parse", error.message);
@@ -390,6 +390,9 @@ export class SignedDocumentCodec {
         verificationFailure("schema", error.message);
       }
       throw error;
+    }
+    if (!isObject(document)) {
+      verificationFailure("schema", "Signed Document is not a JSON object");
     }
 
     const envelope = verifyEnvelope(document, profile);
@@ -614,14 +617,14 @@ function resolveSnapshot(
     snapshot,
     ["bindings", "completeness", "organizationId"],
     "key-resolution",
-    "Key Registry snapshot",
+    "Agent Registry snapshot",
   );
   if (
     typeof snapshot["organizationId"] !== "string" ||
     !Array.isArray(snapshot["bindings"]) ||
     snapshot["bindings"].length === 0
   ) {
-    verificationFailure("key-resolution", "Invalid key Registry snapshot");
+    verificationFailure("key-resolution", "Invalid Agent Registry snapshot");
   }
 
   const normalized = new Map<string, NormalizedKey>();

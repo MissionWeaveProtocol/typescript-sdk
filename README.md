@@ -78,8 +78,8 @@ Verification Profile. `sign` accepts only pure JSON-domain values and a
 then stops at the first of the six normative verification stages. A verified
 result includes immutable document evidence, canonical signing and complete
 document bytes and hashes, exact protected time, signature material, and the
-resolved key and Principal. First Admission, Command freshness, and role
-authorization remain separate checks.
+resolved key and Principal. The First-Admission Record, Command freshness, and
+role authorization remain separate checks.
 
 <!-- example: examples/sign-command.ts -->
 

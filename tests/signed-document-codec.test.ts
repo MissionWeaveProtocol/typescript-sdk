@@ -2,6 +2,13 @@ import { createPrivateKey } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import {
+  Ajv2020,
+  type AnySchema,
+  type ValidateFunction,
+} from "ajv/dist/2020.js";
+import * as formatsNamespace from "ajv-formats";
+import type { FormatsPlugin } from "ajv-formats";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -23,20 +30,49 @@ import {
 } from "../src/index.js";
 
 const root = packageRoot(import.meta.url);
-const keyResolutionEvaluations = loadSignedEvaluations().filter(
+const addFormats = formatsNamespace.default as unknown as FormatsPlugin;
+const fixtureValidators = loadFixtureValidators();
+const signedEvaluations = loadSignedEvaluations();
+const keyResolutionEvaluations = signedEvaluations.filter(
   (evaluation) => evaluation.stage === "key-resolution",
 );
-const completeEvaluations = loadSignedEvaluations().filter(
+const completeEvaluations = signedEvaluations.filter(
   (evaluation) => evaluation.stage === "complete",
 );
-const parseEvaluations = loadSignedEvaluations().filter(
+const parseEvaluations = signedEvaluations.filter(
   (evaluation) => evaluation.stage === "parse",
 );
-const signatureEvaluations = loadSignedEvaluations().filter(
+const signatureEvaluations = signedEvaluations.filter(
   (evaluation) => evaluation.stage === "signature",
 );
 
 describe("SignedDocumentCodec", () => {
+  it("classifies a valid non-object JSON value at schema validation", () => {
+    const resolver: KeyResolver = {
+      resolve() {
+        throw new TypeError(
+          "KeyResolver must not run before schema validation",
+        );
+      },
+    };
+    const verify = () =>
+      new SignedDocumentCodec().verify(
+        SignedDocumentKind.Command,
+        Buffer.from("null"),
+        resolver,
+      );
+
+    expect(verify).toThrow(SignedDocumentVerificationError);
+    try {
+      verify();
+    } catch (error) {
+      expect(error).toMatchObject({
+        auditDetail: { stage: "schema" },
+        wireCode: "SCHEMA_VALIDATION_FAILED",
+      });
+    }
+  });
+
   it("covers the complete 22-case / 58-evaluation bundle contract", () => {
     const manifest = readJson("cryptography/manifest.json");
     const histogram = Object.fromEntries(
@@ -50,13 +86,12 @@ describe("SignedDocumentCodec", () => {
         "complete",
       ].map((stage) => [
         stage,
-        loadSignedEvaluations().filter(
-          (evaluation) => evaluation.stage === stage,
-        ).length,
+        signedEvaluations.filter((evaluation) => evaluation.stage === stage)
+          .length,
       ]),
     );
     expect(asArray(manifest["cases"])).toHaveLength(22);
-    expect(loadSignedEvaluations()).toHaveLength(57);
+    expect(signedEvaluations).toHaveLength(57);
     expect(histogram).toEqual({
       canonicalization: 2,
       complete: 11,
@@ -66,6 +101,22 @@ describe("SignedDocumentCodec", () => {
       signature: 4,
       "signature-envelope": 11,
     });
+  });
+
+  it("uses the manifest-declared fixture schemas before semantic evaluation", () => {
+    const invalidRegistry = Object.fromEntries(
+      Object.entries(readJson("cryptography/keys/registry-valid.json")).filter(
+        ([name]) => name !== "organizationId",
+      ),
+    );
+
+    expect(() =>
+      assertProtocolFixture(
+        "registry",
+        "cryptography/keys/registry-valid.json",
+        invalidRegistry,
+      ),
+    ).toThrow(/Registry fixture schema rejected/u);
   });
 
   it("runs the standalone RFC 8785 bundle evaluation", () => {
@@ -798,12 +849,21 @@ function loadSignedEvaluations(): readonly SignedEvaluation[] {
       if (typeof evaluation["profileId"] !== "string") continue;
       const expectDocument = asObject(evaluation["expect"]);
       const fault = evaluation["fault"];
+      const registryPath = asString(evaluation["registry"]);
+      assertProtocolFixture("registry", registryPath, readJson(registryPath));
+      if (typeof evaluation["signingKey"] === "string") {
+        assertProtocolFixture(
+          "signingKey",
+          evaluation["signingKey"],
+          readJson(evaluation["signingKey"]),
+        );
+      }
       result.push({
         caseId,
         document: asString(evaluation["document"]),
         faultId: fault === null ? "complete" : asString(asObject(fault)["id"]),
         kind: asSignedDocumentKind(evaluation["profileId"]),
-        registry: asString(evaluation["registry"]),
+        registry: registryPath,
         ...(typeof evaluation["signingKey"] === "string"
           ? { signingKey: evaluation["signingKey"] }
           : {}),
@@ -817,6 +877,36 @@ function loadSignedEvaluations(): readonly SignedEvaluation[] {
     }
   }
   return result;
+}
+
+function loadFixtureValidators(): Readonly<
+  Record<"registry" | "signingKey", ValidateFunction>
+> {
+  const manifest = readJson("cryptography/manifest.json");
+  const declared = asObject(manifest["fixtureSchemas"]);
+  const ajv = new Ajv2020({ strict: true, validateFormats: true });
+  addFormats(ajv, { mode: "full" });
+  return Object.freeze({
+    registry: ajv.compile(
+      readJson(asString(declared["registry"])) as AnySchema,
+    ),
+    signingKey: ajv.compile(
+      readJson(asString(declared["signingKey"])) as AnySchema,
+    ),
+  });
+}
+
+function assertProtocolFixture(
+  kind: "registry" | "signingKey",
+  relativePath: string,
+  value: JsonObject,
+): void {
+  const validator = fixtureValidators[kind];
+  if (!validator(value)) {
+    throw new TypeError(
+      `${kind === "registry" ? "Registry" : "Signing-key"} fixture schema rejected ${relativePath}: ${JSON.stringify(validator.errors)}`,
+    );
+  }
 }
 
 function fixtureSigningKey(relativePath: string): SigningKey {
