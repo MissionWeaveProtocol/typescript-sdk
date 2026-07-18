@@ -125,7 +125,12 @@ Frame；不實作網路連線、重新連線、訂閱狀態或部分串流 Frame
 - 使用 Node.js 金鑰的 Ed25519 簽署與驗證；
 - <code>signBytes</code> 和 <code>verifyBytes</code> 位元組層級簽署輔助函式；
 - <code>signDocument</code>、<code>signatureInput</code> 和
-  <code>verifyDocumentSignature</code>。
+  <code>verifyDocumentSignature</code>；
+- <code>SignedDocumentCodec</code>，用於固定九種 Signed
+  Document 類型的六階段簽署與驗證。
+
+<code>SignedDocumentCodec.verify</code> 接受收到的原始 UTF-8 位元組和
+<code>KeyResolver</code>，並回傳規範簽署位元組與雜湊、完整文件雜湊、精確受保護時間，以及已解析的金鑰與 Principal 證據。此結果只證明密碼學驗證；首次准入、Command 新鮮度和授權仍須另外檢查。
 
 ```ts
 import { readFileSync } from "node:fs";

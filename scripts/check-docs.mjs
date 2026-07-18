@@ -61,6 +61,7 @@ const requiredTechnicalLiterals = [
   "FrameCodec",
   "JCS",
   "Ed25519",
+  "SignedDocumentCodec",
   "npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance",
   "schemas/",
   "conformance/",

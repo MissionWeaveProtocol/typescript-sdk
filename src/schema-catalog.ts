@@ -11,6 +11,7 @@ import type { FormatsPlugin } from "ajv-formats";
 
 import type { JsonObject, JsonValue } from "./json-types.js";
 import { packageRoot } from "./package-root.js";
+import { isProtocolRfc3339 } from "./rfc3339.js";
 import { parseStrictJsonObject } from "./strict-json.js";
 
 const addFormats = formatsNamespace.default as unknown as FormatsPlugin;
@@ -126,6 +127,10 @@ export class SchemaCatalog {
       validateFormats: true,
     });
     addFormats(ajv, { mode: "full" });
+    ajv.addFormat("date-time", {
+      type: "string",
+      validate: isProtocolRfc3339,
+    });
 
     const documents = new Map<SchemaName, JsonObject>();
     for (const schemaName of schemaNames) {

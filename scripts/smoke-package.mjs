@@ -55,9 +55,49 @@ try {
   );
   if (
     imported.protocolVersion !== "0.1" ||
-    required.protocolVersion !== "0.1"
+    required.protocolVersion !== "0.1" ||
+    typeof imported.SignedDocumentCodec !== "function" ||
+    typeof required.SignedDocumentCodec !== "function"
   ) {
     throw new Error("packed ESM or CommonJS entry point failed");
+  }
+  const registry = JSON.parse(
+    await readFile(
+      path.join(installedRoot, "cryptography", "keys", "registry-valid.json"),
+      "utf8",
+    ),
+  );
+  const signedCommand = await readFile(
+    path.join(
+      installedRoot,
+      "cryptography",
+      "vectors",
+      "signed-documents",
+      "valid",
+      "command.json",
+    ),
+  );
+  for (const [moduleKind, sdk] of [
+    ["ESM", imported],
+    ["CommonJS", required],
+  ]) {
+    const verified = new sdk.SignedDocumentCodec().verify(
+      sdk.SignedDocumentKind.Command,
+      signedCommand,
+      {
+        resolve() {
+          return { completeness: "organization-wide", ...registry };
+        },
+      },
+    );
+    if (
+      verified.signingHash !==
+      "sha256:6655c5d67ae3ecc19a4ed04bda7f1372aeaafc7adf939a77715de96ef2100695"
+    ) {
+      throw new Error(
+        `packed ${moduleKind} SignedDocumentCodec verification failed`,
+      );
+    }
   }
   const commonJsReport = required.runConformance(installedRoot);
   if (commonJsReport.passed !== 52 || commonJsReport.failed !== 0) {
