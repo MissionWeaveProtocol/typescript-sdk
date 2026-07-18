@@ -49,9 +49,9 @@ const {
 | npm 包         | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
 | 协议版本       | <code>0.1</code>                                      |
 | Wire namespace | <code>missionweaveprotocol</code>                     |
-| 协议提交       | <code>00964ea9064cbf1f0eca8af21a0c57367ee14752</code> |
+| 协议提交       | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
 | Schema         | 21 个                                                 |
-| 一致性测试向量 | 43 个（22 个有效，21 个无效）                         |
+| 一致性测试向量 | 52 个（25 个有效，27 个无效）                         |
 
 完整的来源、文件计数和 SHA-256 摘要记录在 <code>PROTOCOL_PIN.json</code>
 中。SDK 在构建检查期间验证固定工件；它不会在运行时从网络下载 Schema。
@@ -162,7 +162,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 默认的人类可读输出为：
 
 ```text
-43/43 conformance vectors passed (22 valid, 21 invalid).
+52/52 conformance vectors passed (25 valid, 27 invalid).
 ```
 
 使用 JSON 输出：

@@ -26,11 +26,11 @@ Deno support.
 
 SDK version `0.1.0` targets MissionWeaveProtocol `0.1`. Its protocol bundle is
 pinned to commit
-[`00964ea9064cbf1f0eca8af21a0c57367ee14752`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/00964ea9064cbf1f0eca8af21a0c57367ee14752).
+[`6f10987627d62fb296e3490ceceb5539b1e94b70`](https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70).
 See [PROTOCOL_PIN.json](PROTOCOL_PIN.json) for the complete artifact digests.
 
-The package contains 21 schemas and 43 conformance vectors: 22 valid and 21
-invalid. The manifest is the 44th file in the bundled `conformance` directory.
+The package contains 21 schemas and 52 conformance vectors: 25 valid and 27
+invalid. The manifest is the 53rd file in the bundled `conformance` directory.
 CI verifies the vendored schema and conformance bytes against the pin.
 
 ## Strict frame validation
@@ -161,7 +161,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance --root 
 Published tarballs include these paths:
 
 - `schemas/` — 21 Draft 2020-12 JSON Schemas.
-- `conformance/` — the manifest and 43 JSON vectors.
+- `conformance/` — the manifest and 52 JSON vectors.
 - `PROTOCOL_PIN.json` — protocol version, source commit, and artifact digests.
 - `examples/` — the type-checked examples shown above.
 - `dist/` — ESM, CommonJS, declaration files, source maps, and the CLI.

@@ -49,9 +49,9 @@ const {
 | npm 套件       | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
 | 協定版本       | <code>0.1</code>                                      |
 | Wire namespace | <code>missionweaveprotocol</code>                     |
-| 協定提交       | <code>00964ea9064cbf1f0eca8af21a0c57367ee14752</code> |
+| 協定提交       | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
 | Schema         | 21 個                                                 |
-| 一致性測試向量 | 43 個（22 個有效，21 個無效）                         |
+| 一致性測試向量 | 52 個（25 個有效，27 個無效）                         |
 
 完整來源、檔案數量和 SHA-256 摘要記錄在
 <code>PROTOCOL_PIN.json</code>。SDK 會在建置檢查期間驗證固定成品；執行時不會從網路下載 Schema。
@@ -163,7 +163,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 預設的人類可讀輸出為：
 
 ```text
-43/43 conformance vectors passed (22 valid, 21 invalid).
+52/52 conformance vectors passed (25 valid, 27 invalid).
 ```
 
 使用 JSON 輸出：

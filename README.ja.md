@@ -49,9 +49,9 @@ const {
 | npm パッケージ       | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
 | プロトコルバージョン | <code>0.1</code>                                      |
 | Wire namespace       | <code>missionweaveprotocol</code>                     |
-| プロトコルコミット   | <code>00964ea9064cbf1f0eca8af21a0c57367ee14752</code> |
+| プロトコルコミット   | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
 | Schema               | 21                                                    |
-| 適合性テストベクトル | 43（valid 22、invalid 21）                            |
+| 適合性テストベクトル | 52（valid 25、invalid 27）                            |
 
 出典、ファイル数、SHA-256 ダイジェストの全情報は <code>PROTOCOL_PIN.json</code>
 に記録されています。SDK はビルド時のチェックで固定成果物を検証し、実行時にネットワークから Schema をダウンロードしません。
@@ -163,7 +163,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 デフォルトの可読出力は次のとおりです。
 
 ```text
-43/43 conformance vectors passed (22 valid, 21 invalid).
+52/52 conformance vectors passed (25 valid, 27 invalid).
 ```
 
 JSON 出力：
