@@ -6,7 +6,10 @@ import { promisify } from "node:util";
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 
-import { verifyProtocolBundle } from "./protocol-bundle.mjs";
+import {
+  verifyCryptographyBundle,
+  verifyProtocolBundle,
+} from "./protocol-bundle.mjs";
 
 const execute = promisify(execFile);
 const workspace = await mkdtemp(
@@ -79,11 +82,27 @@ try {
     path.join("examples", "strict-frame-validation.ts"),
     path.join("examples", "sign-command.ts"),
     path.join("examples", "run-conformance.ts"),
+    path.join(
+      "cryptography",
+      "vectors",
+      "signed-documents",
+      "invalid",
+      "command-invalid-utf8.bin",
+    ),
+    path.join(
+      "cryptography",
+      "vectors",
+      "canonicalization",
+      "command.signing.jcs",
+    ),
   ]) {
     await access(path.join(installedRoot, packagedPath));
   }
 
-  const bundle = await verifyProtocolBundle(installedRoot);
+  const [bundle, cryptography] = await Promise.all([
+    verifyProtocolBundle(installedRoot),
+    verifyCryptographyBundle(installedRoot),
+  ]);
   const executable = path.join(
     consumer,
     "node_modules",
@@ -100,7 +119,7 @@ try {
     throw new Error("installed conformance executable failed");
   }
   console.log(
-    `Package smoke test passed for ${packResult[0].filename}: ${bundle.schemaFiles} schemas, ${bundle.conformanceFiles} conformance files, and the installed CLI.`,
+    `Package smoke test passed for ${packResult[0].filename}: ${bundle.schemaFiles} schemas, ${bundle.conformanceFiles} conformance files, ${cryptography.artifactCount} cryptography artifacts, and the installed CLI.`,
   );
 } finally {
   await rm(workspace, { force: true, recursive: true });
