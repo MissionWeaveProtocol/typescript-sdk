@@ -52,9 +52,9 @@ Cette version est épinglée aux artefacts MissionWeaveProtocol suivants :
 | Paquet npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
 | Version du protocole   | <code>0.1</code>                                      |
 | Wire namespace         | <code>missionweaveprotocol</code>                     |
-| Commit du protocole    | <code>00964ea9064cbf1f0eca8af21a0c57367ee14752</code> |
+| Commit du protocole    | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
 | Schémas                | 21                                                    |
-| Vecteurs de conformité | 43 (22 valides et 21 non valides)                     |
+| Vecteurs de conformité | 52 (25 valides et 27 non valides)                     |
 
 La provenance complète, le nombre de fichiers et les empreintes SHA-256 sont
 consignés dans <code>PROTOCOL_PIN.json</code>. Le SDK vérifie les artefacts
@@ -175,7 +175,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 La sortie lisible par défaut est :
 
 ```text
-43/43 conformance vectors passed (22 valid, 21 invalid).
+52/52 conformance vectors passed (25 valid, 27 invalid).
 ```
 
 Pour obtenir du JSON :
