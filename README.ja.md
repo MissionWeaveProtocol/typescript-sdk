@@ -1,5 +1,5 @@
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
-| [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) |
+| **日本語** | [Español](README.es.md) | [Français](README.fr.md) |
 [Deutsch](README.de.md)
 
 # MissionWeaveProtocol TypeScript SDK
@@ -7,8 +7,8 @@
 MissionWeaveProtocol の公式 TypeScript SDK です。npm パッケージ名は
 <code>@missionweaveprotocol/sdk</code> です。
 
-> この SDK が適合を表明する範囲は **schema-and-vector conformance
-> only（Schema とテストベクトルへの適合のみ）**です。トランスポートの相互運用性、実行時の振る舞い、エンドツーエンドのプロトコル適合性は表明しません。
+> この SDK が適合を表明する範囲は **schema-and-vector
+> conformance（Schema とテストベクトルへの適合のみ）**です。トランスポートの相互運用性、実行時の振る舞い、エンドツーエンドのプロトコル適合性は表明しません。
 
 ## インストール
 

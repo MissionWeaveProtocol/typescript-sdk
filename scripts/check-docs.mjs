@@ -20,8 +20,36 @@ const readmeNames = [
   "README.fr.md",
   "README.de.md",
 ];
-const switcher =
-  "[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md)";
+const switchers = new Map([
+  [
+    "README.md",
+    "**English** | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.zh-CN.md",
+    "[English](README.md) | **简体中文** | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.zh-TW.md",
+    "[English](README.md) | [简体中文](README.zh-CN.md) | **繁體中文** | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.ja.md",
+    "[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **日本語** | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.es.md",
+    "[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | **Español** | [Français](README.fr.md) | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.fr.md",
+    "[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [Español](README.es.md) | **Français** | [Deutsch](README.de.md)",
+  ],
+  [
+    "README.de.md",
+    "[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) | **Deutsch**",
+  ],
+]);
 const requiredTechnicalLiterals = [
   "@missionweaveprotocol/sdk",
   "Node.js 20",
@@ -40,9 +68,18 @@ const requiredTechnicalLiterals = [
 ];
 const conformanceClaims = new Map([
   ["README.md", "schema-and-vector conformance only"],
-  ["README.zh-CN.md", "schema-and-vector conformance only"],
-  ["README.zh-TW.md", "schema-and-vector conformance only"],
-  ["README.ja.md", "schema-and-vector conformance only"],
+  [
+    "README.zh-CN.md",
+    "schema-and-vector conformance（仅 Schema 与测试向量一致性）",
+  ],
+  [
+    "README.zh-TW.md",
+    "schema-and-vector conformance（僅 Schema 與測試向量一致性）",
+  ],
+  [
+    "README.ja.md",
+    "schema-and-vector conformance（Schema とテストベクトルへの適合のみ）",
+  ],
   ["README.es.md", "conformidad con esquemas y vectores de prueba"],
   ["README.fr.md", "conformité limitée aux schémas et aux vecteurs de test"],
   ["README.de.md", "Schema- und Testvektorkonformität"],
@@ -59,7 +96,8 @@ for (const name of readmeNames) {
   const content = readFileSync(file, "utf8");
   readmes.set(name, content);
   const normalized = content.replace(/^>\s?/gmu, "").replace(/\s+/gu, " ");
-  if (!normalized.includes(switcher)) {
+  const switcher = switchers.get(name);
+  if (switcher === undefined || !normalized.includes(switcher)) {
     failures.push(`${name}: missing the canonical language switcher`);
   }
   for (const literal of requiredTechnicalLiterals) {

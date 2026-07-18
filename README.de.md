@@ -1,6 +1,6 @@
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 | [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) |
-[Deutsch](README.de.md)
+**Deutsch**
 
 # MissionWeaveProtocol TypeScript SDK
 
@@ -153,7 +153,7 @@ const verified = verifyDocumentSignature(
 console.log(verified, canonicalizeJson(signedCommand));
 ```
 
-Die Signatureingabe besteht aus den JCS-Bytes nach dem Entfernen des
+Die Signaturdaten bestehen aus den JCS-Bytes nach dem Entfernen des
 <code>signature</code>-Members auf oberster Ebene.
 <code>verifyDocumentSignature</code> führt nur die kryptografische Verifikation
 aus. Die Anwendung muss Schema, Schlüsselidentität, Vertrauen, Widerruf,
