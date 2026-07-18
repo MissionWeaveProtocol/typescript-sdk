@@ -5,7 +5,8 @@
 # MissionWeaveProtocol TypeScript SDK
 
 Offizielles TypeScript-SDK für MissionWeaveProtocol. Das npm-Paket wird als
-<code>@missionweaveprotocol/sdk</code> veröffentlicht.
+<code>@missionweaveprotocol/sdk</code> veröffentlicht. Es validiert,
+kanonisiert, signiert und testet MissionWeaveProtocol-0.1-Daten.
 
 > Dieses SDK beansprucht ausschließlich **Schema- und Testvektorkonformität**.
 > Es beansprucht weder Transportinteroperabilität noch gleiches
@@ -72,7 +73,7 @@ dem Netzwerk.
 einen <code>string</code> oder <code>Uint8Array</code>. Vor der
 Schemavalidierung verwirft der Parser doppelte Membernamen, ungültiges UTF-8,
 eine UTF-8-BOM, nachgestellte Inhalte, ungültige oder nicht darstellbare Zahlen,
-ungepaarte Unicode-Surrogate und eine zu tiefe Verschachtelung.
+ungepaarte Unicode-Surrogate und eine Verschachtelung von mehr als 512 Ebenen.
 
 <code>SchemaCatalog</code> erstellt offline Ajv-Draft-2020-12-Validatoren aus
 den 21 im Paket festgelegten JSON Schemas:
@@ -129,6 +130,8 @@ Das SDK bietet:
 - <code>sha256Hex</code> und <code>sha256Identifier</code>;
 - strikte Base64url-Kodierung und -Dekodierung ohne Padding;
 - Ed25519-Signierung und -Verifikation mit Node.js-Schlüsseln;
+- <code>signBytes</code> und <code>verifyBytes</code> zum Signieren und Prüfen
+  von Bytes;
 - <code>signDocument</code>, <code>signatureInput</code> und
   <code>verifyDocumentSignature</code>.
 
@@ -166,7 +169,21 @@ Die Signaturdaten bestehen aus den JCS-Bytes nach dem Entfernen des
 aus. Die Anwendung muss Schema, Schlüsselidentität, Vertrauen, Widerruf,
 Aktualität und Replay-Schutz separat prüfen.
 
-## Konformitäts-CLI
+## Konformitätsrunner
+
+Die enthaltenen Vektoren lassen sich auch programmgesteuert ausführen:
+
+```ts
+import { runConformance } from "@missionweaveprotocol/sdk";
+
+const report = runConformance();
+console.log(
+  `${report.passed}/${report.total} vectors passed ` +
+    `(${report.validCases} valid, ${report.invalidCases} invalid)`,
+);
+
+if (report.failed > 0) process.exitCode = 1;
+```
 
 Die installierte ausführbare Datei verarbeitet die im Paket enthaltenen Schemas
 und Testvektoren:
@@ -207,6 +224,8 @@ Der Stamm des veröffentlichten Pakets enthält:
   die festgelegten Testvektoren;
 - <code>PROTOCOL_PIN.json</code>: den Upstream-Commit und die
   Artefaktprüfsummen;
+- <code>examples/</code>: die oben gezeigten typgeprüften Beispiele;
+- <code>dist/</code>: ESM, CommonJS, Deklarationen, Source Maps und die CLI;
 - <code>LICENSE</code> und die lokalisierten README-Dateien.
 
 Mit <code>packageRoot()</code> lassen sich diese Dateien ermitteln:
@@ -226,21 +245,30 @@ Diese Ressourcen sind Dateisystemartefakte und keine JavaScript-Unterpfade in
 
 - Die Schemavalidierung bestätigt die JSON-Struktur, nicht Autorisierung,
   Geschäftssemantik, Zustandsübergänge oder die Sicherheit einer Operation.
+- Ein bereits erstelltes JavaScript-Objekt enthält die ursprünglichen Bytes
+  nicht mehr. Bei direkter Übergabe an <code>SchemaCatalog</code> sind doppelte
+  JSON-Schlüssel oder ungültige Bytes aus einem früheren Parse-Vorgang nicht
+  mehr erkennbar.
 - Dieses SDK bietet keinen Transport, keine Agent Registry,
   Identitätsausstellung, Schlüsselverteilung, Gruppenverwaltung, Ablaufplanung,
   Persistenz, Wiederholungsversuche oder Konsensfindung.
 - Eine gültige Signatur beweist weder, dass der Unterzeichner vertrauenswürdig
   ist, noch dass ein Befehl aktuell ist oder nicht erneut abgespielt wurde.
+- Die Signaturhilfen liefern keine Richtlinien für Schlüsselerzeugung,
+  Schlüsselspeicherung oder Schlüsselerkennung, keine Vertrauensentscheidung,
+  keinen Widerruf, keine Zeitstempelrichtlinie, keinen Replay-Schutz und kein
+  Session-/Membership-/Lease-Fencing.
 - JCS-Funktionen akzeptieren nur JSON-kompatible Daten und verwerfen nicht
   endliche Zahlen, Zyklen, dünn besetzte Arrays, <code>undefined</code> und
   ungepaarte Unicode-Surrogate.
 - <code>SchemaCatalog.load()</code> und der Konformitätsrunner lesen lokale
   Dateien synchron. Sie sind nicht als asynchrone E/A im kritischen Anfragepfad
   zu behandeln.
-- Nicht vertrauenswürdige Daten sollten zuerst strikt als JSON geparst, dann
-  gegen das Schema validiert und anschließend durch die Autorisierungs-,
-  Richtlinien- und Zustandsprüfungen der eigenen Organisation verarbeitet
-  werden.
+- Nicht vertrauenswürdige signierte Daten sollten zuerst strikt geparst und
+  gegen das Schema validiert werden. Danach folgen die Signaturprüfung sowie die
+  Autorisierungs-, Richtlinien- und Zustandsprüfungen der eigenen Organisation.
+  Parse-, Base64url-Dekodier- oder Verifikationsfehler bedeuten stets eine
+  Ablehnung.
 - Ein erfolgreicher CLI-Lauf zeigt nur, dass die enthaltenen Artefakte die
   erwarteten Schemaergebnisse liefern. Der Geltungsbereich bleibt auf die
   **Schema- und Testvektorkonformität** beschränkt.
@@ -250,7 +278,12 @@ Diese Ressourcen sind Dateisystemartefakte und keine JavaScript-Unterpfade in
 ```bash
 npm ci
 npm run check
+npm audit --audit-level=low
 ```
+
+<code>npm run check</code> prüft Namensrichtlinie, Protokoll-Pin, Dokumentation,
+Formatierung, Linting, alle Beispiele, Tests, Build-Ausgaben, Paketmetadaten und
+eine Installation des gepackten Pakets mit ESM, CommonJS, Ressourcen und CLI.
 
 ## Lizenz
 

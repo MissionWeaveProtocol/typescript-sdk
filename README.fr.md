@@ -5,7 +5,8 @@
 # SDK TypeScript MissionWeaveProtocol
 
 SDK TypeScript officiel de MissionWeaveProtocol. Le paquet npm est publié sous
-le nom <code>@missionweaveprotocol/sdk</code>.
+le nom <code>@missionweaveprotocol/sdk</code>. Il permet de valider, de
+canoniser, de signer et de tester les données MissionWeaveProtocol 0.1.
 
 > Ce SDK revendique uniquement une **conformité limitée aux schémas et aux
 > vecteurs de test**. Il ne revendique ni l’interopérabilité du transport, ni
@@ -74,7 +75,7 @@ les schémas depuis le réseau à l’exécution.
 schéma, l’analyseur rejette les noms de membres dupliqués, l’UTF-8 invalide, le
 BOM UTF-8, les données supplémentaires, les nombres invalides ou non
 représentables, les substituts Unicode non appariés et une imbrication
-excessive.
+supérieure à 512 niveaux.
 
 <code>SchemaCatalog</code> construit hors ligne des validateurs Ajv Draft
 2020-12 à partir des 21 JSON Schema épinglés dans le paquet :
@@ -131,6 +132,8 @@ Le SDK fournit :
 - <code>sha256Hex</code> et <code>sha256Identifier</code> ;
 - un encodage et décodage base64url strict, sans remplissage ;
 - la signature et la vérification Ed25519 avec des clés Node.js ;
+- <code>signBytes</code> et <code>verifyBytes</code> pour signer et vérifier des
+  octets ;
 - <code>signDocument</code>, <code>signatureInput</code> et
   <code>verifyDocumentSignature</code>.
 
@@ -169,7 +172,21 @@ cryptographique ; l’application doit encore vérifier le schéma, l’identit�
 confiance de la clé, la révocation, la fraîcheur et la protection contre le
 rejeu.
 
-## CLI de conformité
+## Exécuteur de conformité
+
+Les vecteurs embarqués peuvent aussi être exécutés depuis le code :
+
+```ts
+import { runConformance } from "@missionweaveprotocol/sdk";
+
+const report = runConformance();
+console.log(
+  `${report.passed}/${report.total} vectors passed ` +
+    `(${report.validCases} valid, ${report.invalidCases} invalid)`,
+);
+
+if (report.failed > 0) process.exitCode = 1;
+```
 
 L’exécutable installé traite les schémas et les vecteurs de test fournis dans le
 paquet :
@@ -210,6 +227,9 @@ La racine du paquet publié contient :
   les vecteurs de test épinglés ;
 - <code>PROTOCOL_PIN.json</code> : le commit amont et les empreintes des
   artefacts ;
+- <code>examples/</code> : les exemples avec vérification de types présentés
+  ci-dessus ;
+- <code>dist/</code> : ESM, CommonJS, déclarations, cartes de sources et CLI ;
 - <code>LICENSE</code> et les README traduits.
 
 Utilisez <code>packageRoot()</code> pour localiser ces fichiers :
@@ -229,20 +249,29 @@ JavaScript de <code>exports</code>.
 
 - La validation d’un schéma confirme la structure JSON, pas l’autorisation, la
   sémantique métier, les transitions d’état ou la sûreté d’une opération.
+- Un objet JavaScript déjà construit ne conserve pas les octets source. S’il est
+  transmis directement à <code>SchemaCatalog</code>, les clés JSON dupliquées ou
+  les octets invalides perdus lors d’une analyse antérieure sont indétectables.
 - Ce SDK ne fournit ni transport, ni Agent Registry, ni émission d’identités, ni
   distribution de clés, ni gestion de groupes, ni ordonnancement, ni
   persistance, ni nouvelles tentatives, ni consensus.
 - Une signature valide ne prouve pas que le signataire est digne de confiance,
   ni qu’une commande est encore fraîche ou n’a pas été rejouée.
+- Les fonctions de signature ne fournissent aucune politique de génération, de
+  stockage ou de découverte des clés, aucune décision de confiance, aucun
+  mécanisme de révocation, aucune politique temporelle, aucune prévention du
+  rejeu ni aucun fencing de session, de Membership ou de lease.
 - Les fonctions JCS acceptent uniquement des données compatibles avec JSON et
   rejettent les nombres non finis, les cycles, les tableaux creux,
   <code>undefined</code> et les substituts Unicode non appariés.
 - <code>SchemaCatalog.load()</code> et l’exécuteur de conformité lisent les
   fichiers locaux de façon synchrone ; ne les considérez pas comme des E/S
   asynchrones sur le chemin critique d’une requête.
-- Pour les données non fiables, utilisez d’abord l’analyseur JSON strict,
-  validez ensuite le schéma, puis appliquez les contrôles d’autorisation, de
-  politique et d’état propres à votre organisation.
+- Pour les données signées non fiables, effectuez une analyse stricte et validez
+  le schéma, vérifiez ensuite la signature, puis appliquez les contrôles
+  d’autorisation, de politique et d’état propres à votre organisation. Toute
+  erreur d’analyse, de décodage base64url ou de vérification doit entraîner un
+  rejet.
 - Le succès du CLI indique uniquement que les artefacts inclus produisent les
   résultats de schéma attendus. La portée reste limitée à la **conformité des
   schémas et des vecteurs de test**.
@@ -252,7 +281,13 @@ JavaScript de <code>exports</code>.
 ```bash
 npm ci
 npm run check
+npm audit --audit-level=low
 ```
+
+<code>npm run check</code> vérifie la politique de nommage, l’épingle du
+protocole, la documentation, le formatage, le lint, tous les exemples, les
+tests, la compilation, les métadonnées du paquet et une installation de contrôle
+du paquet pour ESM, CommonJS, les ressources et le CLI.
 
 ## Licence
 
