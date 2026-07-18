@@ -5,7 +5,8 @@
 # MissionWeaveProtocol TypeScript SDK
 
 MissionWeaveProtocol 官方 TypeScript SDK。npm 包名为
-<code>@missionweaveprotocol/sdk</code>。
+<code>@missionweaveprotocol/sdk</code>。它用于验证、规范化、签名和测试 MissionWeaveProtocol
+0.1 数据。
 
 > 本 SDK 仅声明达到 **schema-and-vector
 > conformance（仅 Schema 与测试向量一致性）**。它并不声明传输层互操作性、运行时行为一致性或端到端协议一致性。
@@ -67,7 +68,7 @@ const {
 <code>parseStrictJson</code> 与 <code>parseStrictJsonObject</code> 接受
 <code>string</code> 或
 <code>Uint8Array</code>。解析器会在 Schema 验证之前拒绝重复成员名、无效 UTF-8、UTF-8
-BOM、尾随内容、无效或不可表示的数字、未配对的 Unicode 代理项以及过深的嵌套。
+BOM、尾随内容、无效或不可表示的数字、未配对的 Unicode 代理项，以及超过 512 层的嵌套。
 
 <code>SchemaCatalog</code> 从包内固定的 21 个 JSON Schema 创建离线的 Ajv Draft
 2020-12 验证器：
@@ -122,6 +123,7 @@ const canonicalBytes = codec.encode(frame);
 - <code>sha256Hex</code> 和 <code>sha256Identifier</code>；
 - 严格、无填充的 base64url 编解码；
 - 基于 Node.js 密钥的 Ed25519 签名与验证；
+- <code>signBytes</code> 和 <code>verifyBytes</code> 字节级签名助手；
 - <code>signDocument</code>、<code>signatureInput</code> 和
   <code>verifyDocumentSignature</code>。
 
@@ -157,7 +159,21 @@ console.log(verified, canonicalizeJson(signedCommand));
 <code>verifyDocumentSignature</code>
 只进行密码学验证；调用方仍须验证 Schema、密钥身份、信任、吊销、时效性和防重放策略。
 
-## 一致性测试命令行
+## 一致性测试运行器
+
+可以在程序中运行内置向量：
+
+```ts
+import { runConformance } from "@missionweaveprotocol/sdk";
+
+const report = runConformance();
+console.log(
+  `${report.passed}/${report.total} vectors passed ` +
+    `(${report.validCases} valid, ${report.invalidCases} invalid)`,
+);
+
+if (report.failed > 0) process.exitCode = 1;
+```
 
 已安装的二进制文件会运行随包发布的 Schema 和测试向量：
 
@@ -195,6 +211,8 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance --root 
 - <code>conformance/manifest.json</code> 和
   <code>conformance/vectors/</code>：固定测试向量；
 - <code>PROTOCOL_PIN.json</code>：上游提交和工件摘要；
+- <code>examples/</code>：上文所示且通过类型检查的示例；
+- <code>dist/</code>：ESM、CommonJS、类型声明、source map 和命令行工具；
 - <code>LICENSE</code> 和本地化 README。
 
 可通过 <code>packageRoot()</code> 定位这些文件：
@@ -212,14 +230,18 @@ const schemasDirectory = path.join(packageRoot(), "schemas");
 ## 安全与行为边界
 
 - Schema 验证确认 JSON 结构，不确认授权、业务语义、状态转换或操作是否安全。
+- 已经构造好的 JavaScript 对象不再保留原始字节；直接传给
+  <code>SchemaCatalog</code> 无法发现早先解析时丢失的重复 JSON 键或无效源字节。
 - 本 SDK 不提供传输、Agent
   Registry、身份颁发、密钥分发、群组管理、调度、持久化、重试或共识。
 - 签名成功不代表签名者受信任，也不代表命令仍然新鲜或未被重放。
+- 签名助手不提供密钥生成策略、密钥存储与发现、信任决策、吊销、时间戳策略、防重放机制或 Session/Membership/lease
+  fencing。
 - JCS 函数只接受 JSON 兼容数据，并拒绝非有限数字、循环结构、稀疏数组、<code>undefined</code>
   和未配对的 Unicode 代理项。
 - <code>SchemaCatalog.load()</code>
   和一致性测试运行器同步读取本地文件；不要把它们当作请求热路径中的异步 I/O。
-- 对不受信任的数据，应先使用严格 JSON 解析，再进行 Schema 验证，然后应用本组织的授权、策略和状态检查。
+- 对不受信任的已签名数据，应先严格解析并验证 Schema，再验证签名，最后应用本组织的授权、策略和状态检查；解析、base64url 解码或签名验证错误均应视为拒绝。
 - 命令行成功仅表示随包工件与预期的 Schema 结果一致。这仍然是 **schema-and-vector
   conformance only**。
 
@@ -228,7 +250,11 @@ const schemasDirectory = path.join(packageRoot(), "schemas");
 ```bash
 npm ci
 npm run check
+npm audit --audit-level=low
 ```
+
+<code>npm run check</code>
+会验证仓库命名策略、协议锁定、文档、格式、静态检查、所有示例、测试、构建产物、包元数据，以及 ESM、CommonJS、资源和 CLI 的打包安装冒烟测试。
 
 ## 许可证
 
