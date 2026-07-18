@@ -1,10 +1,13 @@
 import { generateKeyPairSync } from "node:crypto";
 
 import {
-  SchemaCatalog,
-  signDocument,
-  verifyDocumentSignature,
+  encodeBase64Url,
+  SignedDocumentCodec,
+  SignedDocumentKind,
+  signBytes,
   type JsonObject,
+  type KeyResolver,
+  type SigningKey,
 } from "@missionweaveprotocol/sdk";
 
 const unsignedCommand = {
@@ -26,17 +29,49 @@ const unsignedCommand = {
     messageId: "urn:missionweaveprotocol:message:one",
     authority: false,
   },
-} satisfies JsonObject;
+} as const satisfies JsonObject;
 
+const keyId = "urn:missionweaveprotocol:key:coordinator";
 const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-const command = signDocument(unsignedCommand, privateKey, {
-  keyId: "urn:missionweaveprotocol:key:coordinator",
-  createdAt: "2026-07-17T08:00:00Z",
-});
+const signingKey: SigningKey = {
+  algorithm: "Ed25519",
+  keyId,
+  sign(bytes) {
+    return signBytes(bytes, privateKey);
+  },
+};
+const publicKeyBytes = publicKey
+  .export({ format: "der", type: "spki" })
+  .subarray(-32);
+const keyResolver: KeyResolver = {
+  resolve() {
+    return {
+      completeness: "organization-wide",
+      organizationId: "urn:missionweaveprotocol:organization:acme",
+      bindings: [
+        {
+          algorithm: "Ed25519",
+          keyId,
+          principal: unsignedCommand.actor,
+          publicKey: encodeBase64Url(publicKeyBytes),
+          validFrom: "2026-01-01T00:00:00Z",
+          validityHistory: [],
+        },
+      ],
+    };
+  },
+};
 
-SchemaCatalog.load().assertValid("command.schema.json", command);
-if (!verifyDocumentSignature(command, publicKey)) {
-  throw new Error("Command signature did not verify");
-}
+const codec = new SignedDocumentCodec();
+const command = codec.sign(
+  SignedDocumentKind.Command,
+  unsignedCommand,
+  signingKey,
+);
+const verified = codec.verify(
+  SignedDocumentKind.Command,
+  Buffer.from(JSON.stringify(command)),
+  keyResolver,
+);
 
-console.log(command.signature.keyId);
+console.log(verified.signingHash);

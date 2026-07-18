@@ -2,6 +2,23 @@ import type { JsonObject, JsonValue } from "./json-types.js";
 import { isJsonObject } from "./json-types.js";
 
 const MAX_DEPTH = 512;
+const extremeJsonNumberBrand: unique symbol = Symbol("ExtremeJsonNumber");
+
+export interface ExtremeJsonNumber {
+  readonly [extremeJsonNumberBrand]: true;
+  readonly negative: boolean;
+  readonly raw: string;
+}
+
+export type VerificationJsonValue =
+  | ExtremeJsonNumber
+  | JsonValue
+  | VerificationJsonObject
+  | readonly VerificationJsonValue[];
+
+export interface VerificationJsonObject {
+  readonly [key: string]: VerificationJsonValue;
+}
 
 export class StrictJsonSyntaxError extends SyntaxError {
   public readonly offset: number;
@@ -15,7 +32,7 @@ export class StrictJsonSyntaxError extends SyntaxError {
 
 export function parseStrictJson(input: string | Uint8Array): JsonValue {
   const text = decodeInput(input);
-  return new Parser(text).parse();
+  return new Parser(text, "jcs").parse() as JsonValue;
 }
 
 export function parseStrictJsonObject(input: string | Uint8Array): JsonObject {
@@ -26,15 +43,43 @@ export function parseStrictJsonObject(input: string | Uint8Array): JsonObject {
   return value;
 }
 
+export function parseStrictJsonForVerification(
+  input: string | Uint8Array,
+): VerificationJsonValue {
+  return new Parser(decodeInput(input), "verification").parse();
+}
+
+export function parseStrictJsonObjectForVerification(
+  input: string | Uint8Array,
+): VerificationJsonObject {
+  const value = parseStrictJsonForVerification(input);
+  if (!isVerificationJsonObject(value)) {
+    throw new StrictJsonSyntaxError("Expected a JSON object", 0);
+  }
+  return value;
+}
+
+export function isExtremeJsonNumber(
+  value: VerificationJsonValue,
+): value is ExtremeJsonNumber {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    extremeJsonNumberBrand in value
+  );
+}
+
 class Parser {
+  readonly #mode: "jcs" | "verification";
   readonly #text: string;
   #offset = 0;
 
-  public constructor(text: string) {
+  public constructor(text: string, mode: "jcs" | "verification") {
     this.#text = text;
+    this.#mode = mode;
   }
 
-  public parse(): JsonValue {
+  public parse(): VerificationJsonValue {
     this.#skipWhitespace();
     const value = this.#parseValue(0);
     this.#skipWhitespace();
@@ -44,7 +89,7 @@ class Parser {
     return value;
   }
 
-  #parseValue(depth: number): JsonValue {
+  #parseValue(depth: number): VerificationJsonValue {
     if (depth > MAX_DEPTH) this.#fail("Maximum JSON nesting depth exceeded");
     const character = this.#text[this.#offset];
     switch (character) {
@@ -68,10 +113,10 @@ class Parser {
     }
   }
 
-  #parseArray(depth: number): readonly JsonValue[] {
+  #parseArray(depth: number): readonly VerificationJsonValue[] {
     this.#offset += 1;
     this.#skipWhitespace();
-    const result: JsonValue[] = [];
+    const result: VerificationJsonValue[] = [];
     if (this.#consume("]")) return result;
 
     while (true) {
@@ -83,10 +128,10 @@ class Parser {
     }
   }
 
-  #parseObject(depth: number): JsonObject {
+  #parseObject(depth: number): VerificationJsonObject {
     this.#offset += 1;
     this.#skipWhitespace();
-    const result: Record<string, JsonValue> = {};
+    const result: Record<string, VerificationJsonValue> = {};
     const keys = new Set<string>();
     if (this.#consume("}")) return result;
 
@@ -139,13 +184,20 @@ class Parser {
       if (code < 0x20) this.#fail("Unescaped control character in string");
       if (isHighSurrogate(code)) {
         const low = this.#text.charCodeAt(this.#offset + 1);
-        if (!isLowSurrogate(low)) this.#fail("Unpaired high surrogate");
+        if (!isLowSurrogate(low)) {
+          if (this.#mode === "jcs") this.#fail("Unpaired high surrogate");
+          result += character;
+          this.#offset += 1;
+          continue;
+        }
         result += character;
         result += this.#text[this.#offset + 1];
         this.#offset += 2;
         continue;
       }
-      if (isLowSurrogate(code)) this.#fail("Unpaired low surrogate");
+      if (isLowSurrogate(code) && this.#mode === "jcs") {
+        this.#fail("Unpaired low surrogate");
+      }
 
       result += character;
       this.#offset += 1;
@@ -182,19 +234,28 @@ class Parser {
 
   #parseUnicodeEscape(): string {
     const first = this.#parseHexCodeUnit();
-    if (isLowSurrogate(first)) this.#fail("Unpaired low surrogate escape");
+    if (isLowSurrogate(first)) {
+      if (this.#mode === "jcs") this.#fail("Unpaired low surrogate escape");
+      return String.fromCharCode(first);
+    }
     if (!isHighSurrogate(first)) return String.fromCharCode(first);
 
     if (
       this.#text[this.#offset] !== "\\" ||
       this.#text[this.#offset + 1] !== "u"
     ) {
-      this.#fail("High surrogate escape is not followed by a low surrogate");
+      if (this.#mode === "jcs") {
+        this.#fail("High surrogate escape is not followed by a low surrogate");
+      }
+      return String.fromCharCode(first);
     }
     this.#offset += 2;
     const second = this.#parseHexCodeUnit();
     if (!isLowSurrogate(second)) {
-      this.#fail("High surrogate escape is not followed by a low surrogate");
+      if (this.#mode === "jcs") {
+        this.#fail("High surrogate escape is not followed by a low surrogate");
+      }
+      return String.fromCharCode(first, second);
     }
     return String.fromCodePoint(
       0x10000 + ((first - 0xd800) << 10) + (second - 0xdc00),
@@ -211,7 +272,7 @@ class Parser {
     return Number.parseInt(value, 16);
   }
 
-  #parseNumber(): number {
+  #parseNumber(): number | ExtremeJsonNumber {
     const start = this.#offset;
     this.#consume("-");
 
@@ -250,6 +311,13 @@ class Parser {
     const raw = this.#text.slice(start, this.#offset);
     const value = Number(raw);
     if (!Number.isFinite(value)) {
+      if (this.#mode === "verification") {
+        return Object.freeze({
+          [extremeJsonNumberBrand]: true as const,
+          negative: raw.startsWith("-"),
+          raw,
+        });
+      }
       throw new StrictJsonSyntaxError(
         "Number is not representable by the JCS number pipeline",
         start,
@@ -316,6 +384,17 @@ function isWhitespace(character: string | undefined): boolean {
 
 function isDigit(character: string | undefined): boolean {
   return character !== undefined && character >= "0" && character <= "9";
+}
+
+function isVerificationJsonObject(
+  value: VerificationJsonValue,
+): value is VerificationJsonObject {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !isExtremeJsonNumber(value)
+  );
 }
 
 function isNonZeroDigit(character: string | undefined): boolean {

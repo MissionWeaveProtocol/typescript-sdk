@@ -70,11 +70,16 @@ The strict parser rejects duplicate object members, invalid UTF-8, a UTF-8 BOM,
 trailing data, malformed or non-representable numbers, unpaired Unicode
 surrogates, and nesting deeper than 512 levels.
 
-## Command signing and verification
+## Signed Document signing and verification
 
-The signing helpers use Node.js Ed25519 and JCS. `signDocument` removes an
-existing top-level `signature` from the signing input, signs the remaining
-document, and returns a new object with the supplied signature metadata.
+`SignedDocumentCodec` implements the fixed nine-kind Signed Document
+Verification Profile. `sign` accepts only pure JSON-domain values and a
+`SigningKey`; `verify` accepts the received UTF-8 bytes and a `KeyResolver`,
+then stops at the first of the six normative verification stages. A verified
+result includes immutable document evidence, canonical signing and complete
+document bytes and hashes, exact protected time, signature material, and the
+resolved key and Principal. The First-Admission Record, Command freshness, and
+role authorization remain separate checks.
 
 <!-- example: examples/sign-command.ts -->
 
@@ -82,10 +87,13 @@ document, and returns a new object with the supplied signature metadata.
 import { generateKeyPairSync } from "node:crypto";
 
 import {
-  SchemaCatalog,
-  signDocument,
-  verifyDocumentSignature,
+  encodeBase64Url,
+  SignedDocumentCodec,
+  SignedDocumentKind,
+  signBytes,
   type JsonObject,
+  type KeyResolver,
+  type SigningKey,
 } from "@missionweaveprotocol/sdk";
 
 const unsignedCommand = {
@@ -107,25 +115,57 @@ const unsignedCommand = {
     messageId: "urn:missionweaveprotocol:message:one",
     authority: false,
   },
-} satisfies JsonObject;
+} as const satisfies JsonObject;
 
+const keyId = "urn:missionweaveprotocol:key:coordinator";
 const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-const command = signDocument(unsignedCommand, privateKey, {
-  keyId: "urn:missionweaveprotocol:key:coordinator",
-  createdAt: "2026-07-17T08:00:00Z",
-});
+const signingKey: SigningKey = {
+  algorithm: "Ed25519",
+  keyId,
+  sign(bytes) {
+    return signBytes(bytes, privateKey);
+  },
+};
+const publicKeyBytes = publicKey
+  .export({ format: "der", type: "spki" })
+  .subarray(-32);
+const keyResolver: KeyResolver = {
+  resolve() {
+    return {
+      completeness: "organization-wide",
+      organizationId: "urn:missionweaveprotocol:organization:acme",
+      bindings: [
+        {
+          algorithm: "Ed25519",
+          keyId,
+          principal: unsignedCommand.actor,
+          publicKey: encodeBase64Url(publicKeyBytes),
+          validFrom: "2026-01-01T00:00:00Z",
+          validityHistory: [],
+        },
+      ],
+    };
+  },
+};
 
-SchemaCatalog.load().assertValid("command.schema.json", command);
-if (!verifyDocumentSignature(command, publicKey)) {
-  throw new Error("Command signature did not verify");
-}
+const codec = new SignedDocumentCodec();
+const command = codec.sign(
+  SignedDocumentKind.Command,
+  unsignedCommand,
+  signingKey,
+);
+const verified = codec.verify(
+  SignedDocumentKind.Command,
+  Buffer.from(JSON.stringify(command)),
+  keyResolver,
+);
 
-console.log(command.signature.keyId);
+console.log(verified.signingHash);
 ```
 
 Lower-level exports include `canonicalizeJson`, `canonicalJsonBytes`,
 `sha256Hex`, `sha256Identifier`, strict unpadded base64url helpers, `signBytes`,
-`verifyBytes`, and `signatureInput`.
+`verifyBytes`, `signatureInput`, `signDocument`, and `verifyDocumentSignature`.
 
 ## Conformance runner
 

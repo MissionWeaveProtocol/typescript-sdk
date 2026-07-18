@@ -132,7 +132,16 @@ El SDK proporciona:
 - <code>signBytes</code> y <code>verifyBytes</code> para firmar y verificar
   bytes;
 - <code>signDocument</code>, <code>signatureInput</code> y
-  <code>verifyDocumentSignature</code>.
+  <code>verifyDocumentSignature</code>;
+- <code>SignedDocumentCodec</code> para firmar y verificar en seis etapas los
+  nueve tipos fijos de Signed Document.
+
+<code>SignedDocumentCodec.verify</code> recibe los bytes UTF-8 originales y un
+<code>KeyResolver</code>, y devuelve los bytes y el hash canónicos de firma, el
+hash del documento completo, el tiempo protegido exacto y la evidencia de la
+clave y del Principal resueltos. El resultado solo demuestra la verificación
+criptográfica; First-Admission Record, la vigencia del Command y la autorización
+se comprueban por separado.
 
 ```ts
 import { readFileSync } from "node:fs";
