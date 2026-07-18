@@ -1,11 +1,20 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { verifyProtocolBundle } from "./protocol-bundle.mjs";
+import {
+  verifyCryptographyBundle,
+  verifyProtocolBundle,
+} from "./protocol-bundle.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const result = await verifyProtocolBundle(root);
+const [protocol, cryptography] = await Promise.all([
+  verifyProtocolBundle(root),
+  verifyCryptographyBundle(root),
+]);
 
 console.log(
-  `Protocol bundle passed: ${result.schemaFiles} schemas, ${result.conformanceFiles} conformance files, ${result.bundleSha256}.`,
+  `Protocol bundle passed: ${protocol.schemaFiles} schemas, ${protocol.conformanceFiles} conformance files, ${protocol.bundleSha256}.`,
+);
+console.log(
+  `Cryptography bundle passed: ${cryptography.artifactCount} artifacts, ${cryptography.caseCount} cases, ${cryptography.evaluationCount} evaluations, ${cryptography.artifactDigest}.`,
 );
