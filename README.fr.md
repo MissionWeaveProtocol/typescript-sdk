@@ -1,5 +1,5 @@
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
-| [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) |
+| [日本語](README.ja.md) | [Español](README.es.md) | **Français** |
 [Deutsch](README.de.md)
 
 # SDK TypeScript MissionWeaveProtocol
@@ -98,7 +98,7 @@ détail des erreurs Ajv en cas d’échec.
 
 ## WebSocket FrameCodec
 
-<code>FrameCodec</code> décode du JSON strict, valide chaque frame avec
+<code>FrameCodec</code> décode du JSON strict, valide chaque trame avec
 <code>websocket-frame.schema.json</code>, puis l’encode en octets canoniques RFC
 8785 JCS :
 
@@ -112,9 +112,9 @@ const frame = codec.decode(readFileSync("./frame.json"));
 const canonicalBytes = codec.encode(frame);
 ```
 
-Le codec traite uniquement des frames JSON complets. Il n’implémente ni
-connexion réseau, ni reconnexion, ni état des abonnements, ni frames de
-streaming partiels.
+Le codec traite uniquement des trames JSON complètes. Il n’implémente ni
+connexion réseau, ni reconnexion, ni état des abonnements, ni trames de
+streaming partielles.
 
 ## JCS, SHA-256 et Ed25519
 

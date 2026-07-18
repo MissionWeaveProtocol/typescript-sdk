@@ -1,5 +1,5 @@
-[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
-| [日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) |
+[English](README.md) | [简体中文](README.zh-CN.md) | **繁體中文** |
+[日本語](README.ja.md) | [Español](README.es.md) | [Français](README.fr.md) |
 [Deutsch](README.de.md)
 
 # MissionWeaveProtocol TypeScript SDK
@@ -7,8 +7,8 @@
 MissionWeaveProtocol 官方 TypeScript SDK。npm 套件名稱為
 <code>@missionweaveprotocol/sdk</code>。
 
-> 本 SDK 僅聲明達到 **schema-and-vector conformance
-> only（僅 Schema 與測試向量一致性）**。它並不聲明傳輸層互通性、執行期行為一致性或端對端協定一致性。
+> 本 SDK 僅聲明達到 **schema-and-vector
+> conformance（僅 Schema 與測試向量一致性）**。它並不聲明傳輸層互通性、執行期行為一致性或端對端協定一致性。
 
 ## 安裝
 
