@@ -20,6 +20,9 @@ npm install @missionweaveprotocol/sdk
 
 Node.js 20 ou une version ultérieure est requis.
 
+Le SDK utilise les API de système de fichiers et de cryptographie de Node.js ;
+il ne revendique aucune prise en charge des navigateurs ni de Deno.
+
 ## Prise en charge des modules
 
 Le paquet fournit des points d’entrée ESM et CommonJS, ainsi que les
@@ -47,19 +50,22 @@ const {
 
 Cette version est épinglée aux artefacts MissionWeaveProtocol suivants :
 
-| Élément                | Valeur épinglée                                       |
-| ---------------------- | ----------------------------------------------------- |
-| Paquet npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>          |
-| Version du protocole   | <code>0.1</code>                                      |
-| Wire namespace         | <code>missionweaveprotocol</code>                     |
-| Commit du protocole    | <code>6f10987627d62fb296e3490ceceb5539b1e94b70</code> |
-| Schémas                | 21                                                    |
-| Vecteurs de conformité | 52 (25 valides et 27 non valides)                     |
+| Élément                | Valeur épinglée                                               |
+| ---------------------- | ------------------------------------------------------------- |
+| Paquet npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
+| Version du protocole   | <code>0.1</code>                                              |
+| Wire namespace         | <code>missionweaveprotocol</code>                             |
+| Commit du protocole    | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Schémas                | 21                                                            |
+| Vecteurs de conformité | 52 (25 valides et 27 non valides)                             |
+
+[protocol-commit]:
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
 
 La provenance complète, le nombre de fichiers et les empreintes SHA-256 sont
-consignés dans <code>PROTOCOL_PIN.json</code>. Le SDK vérifie les artefacts
-épinglés pendant les contrôles de compilation ; il ne télécharge pas les schémas
-depuis le réseau à l’exécution.
+consignés dans [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json). Le SDK vérifie les
+artefacts épinglés pendant les contrôles de compilation ; il ne télécharge pas
+les schémas depuis le réseau à l’exécution.
 
 ## JSON strict et validation des schémas
 

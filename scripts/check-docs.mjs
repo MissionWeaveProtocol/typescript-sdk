@@ -84,6 +84,48 @@ const conformanceClaims = new Map([
   ["README.fr.md", "conformité limitée aux schémas et aux vecteurs de test"],
   ["README.de.md", "Schema- und Testvektorkonformität"],
 ]);
+const runtimeBoundaryTerms = new Map([
+  [
+    "README.md",
+    ["file-system", "cryptography", "browser", "Deno", "does not claim"],
+  ],
+  ["README.zh-CN.md", ["文件系统", "密码学", "浏览器", "Deno", "不声明支持"]],
+  ["README.zh-TW.md", ["檔案系統", "密碼學", "瀏覽器", "Deno", "不聲稱支援"]],
+  [
+    "README.ja.md",
+    ["ファイルシステム", "暗号", "ブラウザー", "Deno", "対象外"],
+  ],
+  [
+    "README.es.md",
+    [
+      "sistema de archivos",
+      "criptografía",
+      "navegadores",
+      "Deno",
+      "no declara compatibilidad",
+    ],
+  ],
+  [
+    "README.fr.md",
+    [
+      "système de fichiers",
+      "cryptographie",
+      "navigateurs",
+      "Deno",
+      "ne revendique aucune prise en charge",
+    ],
+  ],
+  [
+    "README.de.md",
+    ["Dateisystem", "Kryptografie", "Browser", "Deno", "keine Unterstützung"],
+  ],
+]);
+const protocolPin = JSON.parse(
+  readFileSync(path.join(root, "PROTOCOL_PIN.json"), "utf8"),
+);
+const protocolCommitUrl =
+  "https://github.com/missionweaveprotocol/missionweaveprotocol/commit/" +
+  protocolPin.commit;
 const failures = [];
 const readmes = new Map();
 
@@ -111,6 +153,26 @@ for (const name of readmeNames) {
     !normalized.includes(conformanceClaim)
   ) {
     failures.push(`${name}: missing its localized conformance claim`);
+  }
+  const runtimeTerms = runtimeBoundaryTerms.get(name);
+  if (runtimeTerms === undefined) {
+    failures.push(`${name}: missing its Node.js runtime-boundary vocabulary`);
+  } else {
+    for (const term of runtimeTerms) {
+      if (!normalized.includes(term)) {
+        failures.push(`${name}: missing runtime-boundary term ${term}`);
+      }
+    }
+  }
+  if (
+    !/(?:\[PROTOCOL_PIN\.json\]|\[`PROTOCOL_PIN\.json`\])\(PROTOCOL_PIN\.json\)/u.test(
+      content,
+    )
+  ) {
+    failures.push(`${name}: protocol pin is not a relative Markdown link`);
+  }
+  if (!hasProtocolCommitLink(content)) {
+    failures.push(`${name}: protocol commit is not linked to its source`);
   }
   if (!/(?:`0\.1`|<code>0\.1<\/code>)/u.test(content)) {
     failures.push(`${name}: missing the protocol version literal 0.1`);
@@ -156,9 +218,6 @@ if (
   failures.push("README.md: annotated example set is incomplete or duplicated");
 }
 
-const protocolPin = JSON.parse(
-  readFileSync(path.join(root, "PROTOCOL_PIN.json"), "utf8"),
-);
 if (!english.includes(protocolPin.commit)) {
   failures.push("README.md: protocol pin commit is stale or absent");
 }
@@ -297,6 +356,34 @@ function validateRelativeLinks(sourceName, content) {
       failures.push(`${sourceName}: broken relative link ${target}`);
     }
   }
+}
+
+function hasProtocolCommitLink(content) {
+  const escapedCommit = escapeRegExp(protocolPin.commit);
+  const escapedUrl = escapeRegExp(protocolCommitUrl);
+  const visibleCommit = "(?:" + escapedCommit + "|`" + escapedCommit + "`)";
+  const inlineLink = new RegExp(
+    "\\[" + visibleCommit + "\\]\\(" + escapedUrl + "\\)",
+    "u",
+  );
+  if (inlineLink.test(content)) return true;
+
+  const referenceLink = new RegExp(
+    "\\[" + visibleCommit + "\\]\\[([^\\]]+)\\]",
+    "u",
+  ).exec(content);
+  if (referenceLink === null) return false;
+
+  const escapedLabel = escapeRegExp(referenceLink[1]);
+  const definition = new RegExp(
+    "^\\[" +
+      escapedLabel +
+      "\\]:[ \\t]*(?:\\r?\\n[ \\t]+)?" +
+      escapedUrl +
+      "[ \\t]*$",
+    "imu",
+  );
+  return definition.test(content);
 }
 
 function escapeRegExp(value) {
