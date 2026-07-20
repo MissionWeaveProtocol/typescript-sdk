@@ -52,12 +52,12 @@ const {
 | npm パッケージ       | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
 | プロトコルバージョン | <code>0.1</code>                                              |
 | Wire namespace       | <code>missionweaveprotocol</code>                             |
-| プロトコルコミット   | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| プロトコルコミット   | [`33e47ad8a7318f942de77fb72dbb054d85881b40`][protocol-commit] |
 | Schema               | 21                                                            |
-| 適合性テストベクトル | 52（valid 25、invalid 27）                                    |
+| 適合性テストベクトル | 56（valid 26、invalid 30）                                    |
 
 [protocol-commit]:
-  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40
 
 出典、ファイル数、SHA-256 ダイジェストの全情報は
 [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json)
@@ -192,7 +192,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 デフォルトの可読出力は次のとおりです。
 
 ```text
-52/52 conformance vectors passed (25 valid, 27 invalid).
+56/56 conformance vectors passed (26 valid, 30 invalid).
 ```
 
 JSON 出力：

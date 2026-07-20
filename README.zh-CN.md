@@ -52,12 +52,12 @@ const {
 | npm 包         | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
 | 协议版本       | <code>0.1</code>                                              |
 | Wire namespace | <code>missionweaveprotocol</code>                             |
-| 协议提交       | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| 协议提交       | [`33e47ad8a7318f942de77fb72dbb054d85881b40`][protocol-commit] |
 | Schema         | 21 个                                                         |
-| 一致性测试向量 | 52 个（25 个有效，27 个无效）                                 |
+| 一致性测试向量 | 56 个（26 个有效，30 个无效）                                 |
 
 [protocol-commit]:
-  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40
 
 完整的来源、文件计数和 SHA-256 摘要记录在
 [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json)
@@ -190,7 +190,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 默认的人类可读输出为：
 
 ```text
-52/52 conformance vectors passed (25 valid, 27 invalid).
+56/56 conformance vectors passed (26 valid, 30 invalid).
 ```
 
 使用 JSON 输出：

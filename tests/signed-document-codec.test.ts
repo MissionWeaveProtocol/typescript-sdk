@@ -559,7 +559,7 @@ describe("SignedDocumentCodec", () => {
     }
   });
 
-  it("classifies non-JCS signature metadata at stage 5", () => {
+  it("classifies a non-ASCII signature key ID at stage 3", () => {
     const document = structuredClone(
       readJson("cryptography/vectors/signed-documents/valid/command.json"),
     ) as Record<string, unknown>;
@@ -596,8 +596,8 @@ describe("SignedDocumentCodec", () => {
       verify();
     } catch (error) {
       expect(error).toMatchObject({
-        auditDetail: { stage: "canonicalization" },
-        wireCode: "PROTOCOL_VIOLATION",
+        auditDetail: { stage: "schema" },
+        wireCode: "SCHEMA_VALIDATION_FAILED",
       });
     }
   });

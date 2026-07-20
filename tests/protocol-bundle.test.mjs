@@ -37,7 +37,7 @@ describe("verifyCryptographyBundle", () => {
     await expect(verifyCryptographyBundle(repositoryRoot)).resolves.toEqual({
       artifactCount: 94,
       artifactDigest:
-        "sha256:487e18c1ea7053432953f28d1496ae4fdb8e9d42c2eeb8e94f9b21f8cc2596a2",
+        "sha256:159a4900987723537d0d110ec6724c5e1ee52854951a9c69278386d751baae08",
       caseCount: 22,
       evaluationCount: 58,
       manifestVersion: 1,

@@ -100,7 +100,7 @@ try {
     }
   }
   const commonJsReport = required.runConformance(installedRoot);
-  if (commonJsReport.passed !== 52 || commonJsReport.failed !== 0) {
+  if (commonJsReport.passed !== 56 || commonJsReport.failed !== 0) {
     throw new Error("packed CommonJS conformance runner failed");
   }
 
@@ -155,7 +155,7 @@ try {
     cwd: consumer,
     maxBuffer: 10 * 1024 * 1024,
   });
-  if (!conformance.stdout.includes("52/52 conformance vectors passed")) {
+  if (!conformance.stdout.includes("56/56 conformance vectors passed")) {
     throw new Error("installed conformance executable failed");
   }
   console.log(
