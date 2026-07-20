@@ -56,12 +56,12 @@ Cette version est épinglée aux artefacts MissionWeaveProtocol suivants :
 | Paquet npm             | <code>@missionweaveprotocol/sdk@0.1.0</code>                  |
 | Version du protocole   | <code>0.1</code>                                              |
 | Wire namespace         | <code>missionweaveprotocol</code>                             |
-| Commit du protocole    | [`6f10987627d62fb296e3490ceceb5539b1e94b70`][protocol-commit] |
+| Commit du protocole    | [`33e47ad8a7318f942de77fb72dbb054d85881b40`][protocol-commit] |
 | Schémas                | 21                                                            |
-| Vecteurs de conformité | 52 (25 valides et 27 non valides)                             |
+| Vecteurs de conformité | 56 (26 valides et 30 non valides)                             |
 
 [protocol-commit]:
-  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/6f10987627d62fb296e3490ceceb5539b1e94b70
+  https://github.com/missionweaveprotocol/missionweaveprotocol/commit/33e47ad8a7318f942de77fb72dbb054d85881b40
 
 La provenance complète, le nombre de fichiers et les empreintes SHA-256 sont
 consignés dans [`PROTOCOL_PIN.json`](PROTOCOL_PIN.json). Le SDK vérifie les
@@ -207,7 +207,7 @@ npx --package @missionweaveprotocol/sdk missionweaveprotocol-conformance
 La sortie lisible par défaut est :
 
 ```text
-52/52 conformance vectors passed (25 valid, 27 invalid).
+56/56 conformance vectors passed (26 valid, 30 invalid).
 ```
 
 Pour obtenir du JSON :

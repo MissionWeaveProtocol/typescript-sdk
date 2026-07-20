@@ -15,6 +15,10 @@ import { isProtocolRfc3339 } from "./rfc3339.js";
 import { parseStrictJsonObject } from "./strict-json.js";
 
 const addFormats = formatsNamespace.default as unknown as FormatsPlugin;
+const ajvFullUriFormat: unknown = addFormats.get("uri", "full");
+const nonRfc3986AsciiCharacter = /[^A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]/u;
+const emptyHierPartUri =
+  /^[A-Za-z][A-Za-z0-9+.-]*:(?:\?(?:[A-Za-z0-9._~!$&'()*+,;=:@/?-]|%[0-9A-Fa-f]{2})*)?(?:#(?:[A-Za-z0-9._~!$&'()*+,;=:@/?-]|%[0-9A-Fa-f]{2})*)?$/u;
 
 export const schemaNames = [
   "agent-card.schema.json",
@@ -127,6 +131,10 @@ export class SchemaCatalog {
       validateFormats: true,
     });
     addFormats(ajv, { mode: "full" });
+    ajv.addFormat("uri", {
+      type: "string",
+      validate: isRfc3986AbsoluteUri,
+    });
     ajv.addFormat("date-time", {
       type: "string",
       validate: isProtocolRfc3339,
@@ -154,4 +162,30 @@ export class SchemaCatalog {
       this.#validators.set(schemaName, validator);
     }
   }
+}
+
+function isRfc3986AbsoluteUri(value: string): boolean {
+  if (nonRfc3986AsciiCharacter.test(value)) return false;
+  return matchesFormat(ajvFullUriFormat, value) || emptyHierPartUri.test(value);
+}
+
+function matchesFormat(format: unknown, value: string): boolean {
+  if (format instanceof RegExp) {
+    format.lastIndex = 0;
+    const matches = format.test(value);
+    format.lastIndex = 0;
+    return matches;
+  }
+  if (typeof format === "function") {
+    return Boolean((format as (input: string) => boolean)(value));
+  }
+  if (typeof format === "object" && format !== null && "validate" in format) {
+    return matchesFormat(
+      (format as { readonly validate: unknown }).validate,
+      value,
+    );
+  }
+  throw new TypeError(
+    "ajv-formats did not provide a synchronous URI validator",
+  );
 }

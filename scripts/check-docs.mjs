@@ -178,7 +178,7 @@ for (const name of readmeNames) {
   if (!/(?:`0\.1`|<code>0\.1<\/code>)/u.test(content)) {
     failures.push(`${name}: missing the protocol version literal 0.1`);
   }
-  for (const count of ["21", "52", "25", "27"]) {
+  for (const count of ["21", "56", "26", "30"]) {
     if (!content.includes(count))
       failures.push(`${name}: missing count ${count}`);
   }
@@ -233,9 +233,9 @@ const validCount = manifest.filter((entry) => entry.valid === true).length;
 const invalidCount = manifest.filter((entry) => entry.valid === false).length;
 if (
   schemaCount !== 21 ||
-  manifest.length !== 52 ||
-  validCount !== 25 ||
-  invalidCount !== 27
+  manifest.length !== 56 ||
+  validCount !== 26 ||
+  invalidCount !== 30
 ) {
   failures.push(
     `documentation counts changed: ${schemaCount} schemas, ${manifest.length} vectors, ${validCount} valid, ${invalidCount} invalid`,
